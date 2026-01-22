@@ -9,6 +9,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^5.16.12"
+    "@tailwindcss/vite": "^4.1.18",
+    "astro": "^5.16.12",
+    "convex": "^1.31.5",
+    "node-cloudflare-r2": "^0.5.1",
+    "tailwindcss": "^4.1.18"
   }
 }
