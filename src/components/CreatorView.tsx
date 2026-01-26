@@ -31,13 +31,13 @@ function CreatorViewContent() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
-            <Card className="w-full max-w-3xl shadow-lg">
-                <CardHeader className="flex flex-col gap-2 pb-0">
-                    <h1 className="text-2xl font-bold">Create New Snippet</h1>
-                    <p className="text-gray-500">Share code securely with password protection.</p>
+        <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-[var(--color-surface-100)]">
+            <Card className="w-full max-w-3xl shadow-lg border border-[var(--color-surface-200)]">
+                <CardHeader className="flex flex-col gap-2 pb-0 border-b border-[var(--color-surface-200)] bg-[var(--color-surface-50)] p-6">
+                    <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">Create New Snippet</h1>
+                    <p className="text-[var(--color-text-secondary)]">Share code securely with password protection.</p>
                 </CardHeader>
-                <CardBody className="gap-6 py-6">
+                <CardBody className="gap-6 p-6 bg-white">
                     <Input
                         label="Admin Password"
                         type="password"

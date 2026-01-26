@@ -1,2 +1,64 @@
 @import "tailwindcss";
-@import "@heroui/styles";
+@plugin '../../hero.ts';
+/* Note: You may need to change the path to fit your project structure */
+@source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
+
+/* Data Science / Jupyter / Notion inspired theme */
+:root {
+    /* Surface colors - Clean, white, off-white */
+    --color-surface-50: #ffffff;
+    --color-surface-100: #f8f9fa;
+    /* Light gray surface */
+    --color-surface-200: #e9ecef;
+    /* Border color */
+
+    /* Text colors - High contrast but not pure black */
+    --color-text-primary: #212529;
+    --color-text-secondary: #495057;
+    --color-text-tertiary: #868e96;
+
+    /* Accent colors - Scientific Blue/Purple */
+    --color-accent-primary: #007bff;
+    /* Standard scientific blue */
+    --color-accent-secondary: #6610f2;
+    /* Deep purple */
+    --color-success: #28a745;
+    --color-warning: #ffc107;
+    --color-danger: #dc3545;
+
+    /* Code colors */
+    --color-code-bg: #f6f8fa;
+    /* Github-like light code bg */
+
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', Menlo, monospace;
+}
+
+body {
+    background-color: var(--color-surface-100);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Force light mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: light;
+    }
+}
+
+.font-mono {
+    font-family: var(--font-mono);
+}
+
+.font-sans {
+    font-family: var(--font-sans);
+}
+
+/* Code block styling */
+pre,
+code {
+    font-family: var(--font-mono);
+}
