@@ -1,10 +1,10 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import SnippetViewer from "../components/SnippetViewer";
+import SnippetViewerRoot from "../components/SnippetViewerRoot";
 
 const { id } = Astro.params;
 ---
 
 <Layout>
-    <SnippetViewer client:only="react" publicId={id || ""} />
+    <SnippetViewerRoot client:only="react" publicId={id || ""} />
 </Layout>

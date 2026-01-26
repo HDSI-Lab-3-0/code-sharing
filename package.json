@@ -21,13 +21,17 @@
     "date-fns": "^4.1.0",
     "diff": "^8.0.3",
     "framer-motion": "^12.28.1",
+    "highlight.js": "^11.11.1",
+    "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.6",
     "@types/diff": "^8.0.0",
     "@types/node": "^25.0.10",
-    "@types/react": "^19.2.9"
+    "@types/react": "^19.2.9",
+    "typescript": "^5.9.3"
   }
 }
