@@ -8,31 +8,38 @@
 :root {
     /* Surface colors - Clean, white, off-white */
     --color-surface-50: #ffffff;
-    --color-surface-100: #f8f9fa;
-    /* Light gray surface */
-    --color-surface-200: #e9ecef;
-    /* Border color */
+    --color-surface-100: #fcfcfc;
+    /* Very subtle off-white */
+    --color-surface-200: #e5e7eb;
+    /* Light border gray */
 
-    /* Text colors - High contrast but not pure black */
-    --color-text-primary: #212529;
-    --color-text-secondary: #495057;
-    --color-text-tertiary: #868e96;
+    /* Text colors */
+    --color-text-primary: #111827;
+    /* Near black */
+    --color-text-secondary: #4b5563;
+    /* Dark gray */
+    --color-text-tertiary: #9ca3af;
+    /* Light gray */
 
-    /* Accent colors - Scientific Blue/Purple */
-    --color-accent-primary: #007bff;
-    /* Standard scientific blue */
-    --color-accent-secondary: #6610f2;
-    /* Deep purple */
-    --color-success: #28a745;
-    --color-warning: #ffc107;
-    --color-danger: #dc3545;
+    /* Accent colors - Scientific Blue/Teal */
+    --color-accent-primary: #0284c7;
+    /* Sky blue 600 */
+    --color-accent-secondary: #0ea5e9;
+    /* Sky blue 500 */
+
+    --color-success: #10b981;
+    /* Emerald */
+    --color-warning: #f59e0b;
+    /* Amber */
+    --color-danger: #ef4444;
+    /* Red */
 
     /* Code colors */
-    --color-code-bg: #f6f8fa;
-    /* Github-like light code bg */
+    --color-code-bg: #f8fafc;
+    /* Slate 50 */
 
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', Menlo, monospace;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
 }
 
 body {
