@@ -1,9 +1,12 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Button, Textarea, Card, CardBody, CardHeader, Select, SelectItem, Chip, Tab, Tabs, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from "@heroui/react";
 import { formatDistanceToNow } from "date-fns";
-import * as Diff from 'diff';
+import { Button, Chip, Card, CardHeader, CardBody, Tabs, Tab, Select, SelectItem, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from "@heroui/react";
+import * as Diff from "diff";
+import type { Change } from "diff";
+import { highlightHtml, detectLanguage } from "../lib/highlighter";
+import 'highlight.js/styles/github.css'; // Import a highlight.js theme
 import Provider from "./Provider";
 
 // --- Sub-components ---
@@ -98,54 +101,106 @@ function ConsoleSection({ feedbackList, onSubmitFeedback, isLoading }: { feedbac
     );
 }
 
-function CodeDisplay({ code, language, compareCode, viewMode }: { code: string, language: string, compareCode?: string, viewMode: 'code' | 'diff' }) {
+function trimEmptyEdgeLines(value: string) {
+    const lines = value.split('\n');
+    while (lines.length && lines[0].trim() === '') {
+        lines.shift();
+    }
+    while (lines.length && lines[lines.length - 1].trim() === '') {
+        lines.pop();
+    }
+    return lines.join('\n');
+}
+
+function CodeDisplay({ code, language: initialLanguage, compareCode, viewMode }: { code: string, language: string, compareCode?: string, viewMode: 'code' | 'diff' }) {
+    const normalizedCode = trimEmptyEdgeLines(code);
+    const normalizedCompareCode = compareCode ? trimEmptyEdgeLines(compareCode) : undefined;
+
+    // Auto-detect language if not provided or set to 'auto'
+    const detectedLanguage = useMemo(() => {
+        if (!initialLanguage || initialLanguage === 'auto') {
+            return detectLanguage(normalizedCode) || 'plaintext';
+        }
+        return initialLanguage;
+    }, [normalizedCode, initialLanguage]);
+
+    const lines = normalizedCode.split('\n');
+
     if (viewMode === 'code' || !compareCode) {
-        const lines = code.split('\n');
         return (
-            <div className="relative group flex bg-[var(--color-code-bg)] min-h-[600px] text-sm font-mono overflow-auto">
+            <div className="flex bg-[var(--color-code-bg)] overflow-x-auto font-mono text-sm leading-relaxed min-h-[600px]">
                 {/* Line Numbers */}
-                <div className="flex flex-col text-right select-none bg-[var(--color-surface-100)] border-r border-[var(--color-surface-200)] py-4 px-2 min-w-[3rem] text-[var(--color-text-tertiary)]">
+                <div className="flex flex-col text-right select-none bg-(--color-surface-100) border-r border-(--color-surface-200) py-0 px-2 min-w-[3rem] text-[var(--color-text-tertiary)] shrink-0">
                     {lines.map((_, i) => (
-                        <span key={i} className="leading-relaxed px-1">{i + 1}</span>
+                        <div key={i} className="flex justify-end leading-relaxed min-h-[1.5em] items-center">
+                            <span className="px-1">{i + 1}</span>
+                        </div>
                     ))}
                 </div>
 
                 {/* Code Content */}
-                <pre className="flex-1 p-4 overflow-auto text-[var(--color-text-primary)] leading-relaxed">
-                    <code className={`language-${language} table`}>{code}</code>
-                </pre>
+                <div className="flex-1 overflow-auto">
+                    {lines.map((line, i) => {
+                        const { html: lineHtml } = highlightHtml(line, detectedLanguage);
+                        return (
+                            <div 
+                                key={i} 
+                                className="px-4 w-full whitespace-pre flex leading-relaxed min-h-[1.5em] items-center"
+                            >
+                                <span 
+                                    className="w-full"
+                                    dangerouslySetInnerHTML={{ __html: lineHtml || ' ' }}
+                                />
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         );
     }
 
-    const diff = Diff.diffLines(compareCode, code);
+    const diff = Diff.diffLines(normalizedCompareCode ?? '', normalizedCode);
     let oldLineCounter = 1;
     let newLineCounter = 1;
 
     // Flatten diff parts into lines for unified view with line numbers
-    // This approach iterates parts and their internal lines to render row by row if needed,
-    // or just render blocks with line number ranges. 
-    // To strictly match "line numbers in diff", rendering by line is safest.
-
-    // Convert diff parts to a list of rows
     const rows: { type: 'added' | 'removed' | 'unchanged', content: string, oldLine: number | null, newLine: number | null }[] = [];
 
-    diff.forEach(part => {
+    diff.forEach((part) => {
         if (!part.value) return;
-        const lines = part.value.split('\n');
-        // diffLines often ends with a newline which creates an empty string at end of split.
-        // We generally ignore the last empty string if it comes from the split of a trailing newline.
-        if (lines.length > 0 && lines[lines.length - 1] === '') {
-            lines.pop();
+        
+        // Split change into individual lines while preventing extra blanks
+        const segmentLines = part.value.split('\n');
+        if (segmentLines.length && segmentLines[segmentLines.length - 1] === '') {
+            segmentLines.pop();
         }
 
-        lines.forEach(line => {
+        // Apply syntax highlighting to each line in diff view
+        segmentLines.forEach(line => {
             if (part.added) {
-                rows.push({ type: 'added', content: line, oldLine: null, newLine: newLineCounter++ });
+                const { html } = highlightHtml(line, detectedLanguage);
+                rows.push({ 
+                    type: 'added', 
+                    content: html, 
+                    oldLine: null, 
+                    newLine: newLineCounter++ 
+                });
             } else if (part.removed) {
-                rows.push({ type: 'removed', content: line, oldLine: oldLineCounter++, newLine: null });
+                const { html } = highlightHtml(line, detectedLanguage);
+                rows.push({ 
+                    type: 'removed', 
+                    content: html, 
+                    oldLine: oldLineCounter++, 
+                    newLine: null 
+                });
             } else {
-                rows.push({ type: 'unchanged', content: line, oldLine: oldLineCounter++, newLine: newLineCounter++ });
+                const { html } = highlightHtml(line, detectedLanguage);
+                rows.push({ 
+                    type: 'unchanged', 
+                    content: html, 
+                    oldLine: oldLineCounter++, 
+                    newLine: newLineCounter++ 
+                });
             }
         });
     });
@@ -153,16 +208,16 @@ function CodeDisplay({ code, language, compareCode, viewMode }: { code: string, 
     return (
         <div className="flex bg-[var(--color-code-bg)] overflow-x-auto font-mono text-sm leading-relaxed min-h-[600px]">
             {/* Line Numbers Column */}
-            <div className="flex flex-col text-right select-none bg-[var(--color-surface-100)] border-r border-[var(--color-surface-200)] py-4 px-2 min-w-[3rem] text-[var(--color-text-tertiary)] shrink-0">
+            <div className="flex flex-col text-right select-none bg-(--color-surface-100) border-r border-(--color-surface-200) py-0 px-2 min-w-[3rem] text-[var(--color-text-tertiary)] shrink-0">
                 {rows.map((row, i) => (
-                    <div key={i} className="flex cursor-default leading-relaxed justify-end">
+                    <div key={i} className="flex cursor-default leading-relaxed min-h-[1.5em] justify-end items-center">
                         <span className="px-1">{row.newLine || '\u00A0'}</span>
                     </div>
                 ))}
             </div>
 
             {/* Content Column */}
-            <div className="flex-1 py-4 overflow-auto">
+            <div className="flex-1 overflow-auto">
                 {rows.map((row, i) => {
                     let bgColor = 'bg-transparent';
                     let textColor = 'text-[var(--color-text-primary)]';
@@ -176,8 +231,14 @@ function CodeDisplay({ code, language, compareCode, viewMode }: { code: string, 
                     }
 
                     return (
-                        <div key={i} className={`${bgColor} ${textColor} px-4 w-full whitespace-pre-wrap flex leading-relaxed hover:opacity-90`}>
-                            <span>{row.content}</span>
+                        <div 
+                            key={i} 
+                            className={`${bgColor} ${textColor} px-4 w-full whitespace-pre flex leading-relaxed hover:opacity-90 min-h-[1.5em] items-center`}
+                        >
+                            <span 
+                                className="w-full"
+                                dangerouslySetInnerHTML={{ __html: row.content || ' ' }}
+                            />
                         </div>
                     );
                 })}

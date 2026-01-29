@@ -4,6 +4,45 @@
 @source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
 @custom-variant dark (&:is(.dark *));
 
+/* Import highlight.js theme */
+@import 'highlight.js/styles/github.css';
+
+/* Custom code block styles */
+pre {
+    @apply my-4 p-0 !important;
+    background: #f6f8fa !important;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+pre code.hljs {
+    @apply p-4 text-sm leading-relaxed font-mono;
+    background: transparent !important;
+    display: block;
+    overflow-x: auto;
+}
+
+/* Line numbers */
+.hljs-ln {
+    @apply table;
+    width: 100%;
+}
+
+.hljs-ln-n {
+    @apply pr-4 text-gray-400 select-none;
+    text-align: right;
+    width: 2.5rem;
+}
+
+/* Diff specific styles */
+.diff-added {
+    @apply bg-green-50;
+}
+
+.diff-removed {
+    @apply bg-red-50;
+}
+
 /* Data Science / Jupyter / Notion inspired theme */
 :root {
     /* Surface colors - Clean, white, off-white */

@@ -1,8 +1,17 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Button, Input, Textarea, Card, CardBody, CardHeader } from "@heroui/react";
+import { Button, Input, Textarea, Card, CardBody, CardHeader, Select, SelectItem as NextSelectItem } from "@heroui/react";
+import type { SelectItemProps } from "@heroui/select";
 import Provider from "./Provider";
+import { LANGUAGE_OPTIONS } from "../lib/highlighter";
+
+// Create a type-safe SelectItem component
+const SelectItem = (props: SelectItemProps) => (
+  <NextSelectItem {...props}>
+    {props.children}
+  </NextSelectItem>
+);
 
 function CreatorViewContent() {
     const [gatePassword, setGatePassword] = useState("");
@@ -97,20 +106,21 @@ function CreatorViewContent() {
                 </CardHeader>
                 <CardBody className="gap-6 p-6 bg-white">
                     <div className="flex gap-4">
-                        <select
-                            className="px-3 py-2 border rounded-xl border-[var(--color-surface-200)] outline-none focus:border-[var(--color-accent-primary)] w-56 text-sm bg-white text-[var(--color-text-primary)]"
-                            value={language}
-                            onChange={(e) => setLanguage(e.target.value)}
-                        >
-                            <option value="javascript">JavaScript</option>
-                            <option value="typescript">TypeScript</option>
-                            <option value="python">Python</option>
-                            <option value="html">HTML</option>
-                            <option value="css">CSS</option>
-                            <option value="json">JSON</option>
-                            <option value="sql">SQL</option>
-                            <option value="markdown">Markdown</option>
-                        </select>
+                        <div className="w-56">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Language</label>
+                            <select
+                                className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                value={language}
+                                onChange={(e) => setLanguage(e.target.value)}
+                            >
+                                <option value="auto">Auto-detect</option>
+                                {LANGUAGE_OPTIONS.map((lang) => (
+                                    <option key={lang.id} value={lang.id}>
+                                        {lang.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     <Textarea
