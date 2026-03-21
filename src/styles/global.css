@@ -1,23 +1,21 @@
 @import "tailwindcss";
-@plugin '../../hero.ts';
-/* Note: You may need to change the path to fit your project structure */
-@source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
-@custom-variant dark (&:is(.dark *));
 
 /* Import highlight.js theme */
 @import 'highlight.js/styles/github.css';
 
 /* Custom code block styles */
 pre {
-    @apply my-4 p-0 !important;
-    background: #f6f8fa !important;
+    @apply my-4 p-0;
+    margin-block: 1rem;
+    padding: 0;
+    background: #f6f8fa;
     border-radius: 0.5rem;
     overflow: hidden;
 }
 
 pre code.hljs {
     @apply p-4 text-sm leading-relaxed font-mono;
-    background: transparent !important;
+    background: transparent;
     display: block;
     overflow-x: auto;
 }
@@ -43,49 +41,144 @@ pre code.hljs {
     @apply bg-red-50;
 }
 
-/* Data Science / Jupyter / Notion inspired theme */
 :root {
-    /* Surface colors - Clean, white, off-white */
-    --color-surface-50: #ffffff;
-    --color-surface-100: #fcfcfc;
-    /* Very subtle off-white */
-    --color-surface-200: #e5e7eb;
-    /* Light border gray */
+    --color-on-tertiary-fixed-variant: #5d4217;
+    --color-on-secondary: #ffffff;
+    --color-on-tertiary-container: #af8c5b;
+    --color-surface-variant: #e1e2e5;
+    --color-primary-fixed-dim: #b4c7ed;
+    --color-primary-fixed: #d6e3ff;
+    --color-surface-bright: #f8f9fc;
+    --color-primary-container: #182b49;
+    --color-on-error: #ffffff;
+    --color-inverse-on-surface: #f0f1f4;
+    --color-secondary-container: #fecc00;
+    --color-on-background: #191c1e;
+    --color-secondary-fixed-dim: #f0c100;
+    --color-on-error-container: #93000a;
+    --color-tertiary-fixed: #ffddb2;
+    --color-background: #f8f9fc;
+    --color-on-secondary-fixed-variant: #574500;
+    --color-tertiary-fixed-dim: #e8c08a;
+    --color-on-surface: #191c1e;
+    --color-surface-container: #edeef1;
+    --color-on-primary-fixed: #061b39;
+    --color-surface-container-highest: #e1e2e5;
+    --color-primary: #011633;
+    --color-surface-container-lowest: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-outline: #75777e;
+    --color-on-surface-variant: #44474e;
+    --color-inverse-primary: #b4c7ed;
+    --color-surface-container-high: #e7e8eb;
+    --color-on-primary-fixed-variant: #354767;
+    --color-on-primary: #ffffff;
+    --color-on-tertiary: #ffffff;
+    --color-on-tertiary-fixed: #291800;
+    --color-tertiary: #221300;
+    --color-on-secondary-fixed: #241a00;
+    --color-on-secondary-container: #6e5700;
+    --color-error: #ba1a1a;
+    --color-surface-container-low: #f2f3f6;
+    --color-surface: #f8f9fc;
+    --color-tertiary-container: #3d2600;
+    --color-secondary: #735c00;
+    --color-on-primary-container: #8093b6;
+    --color-surface-dim: #d9dadd;
+    --color-inverse-surface: #2e3133;
+    --color-surface-tint: #4d5f80;
+    --color-outline-variant: #c5c6ce;
+    --color-secondary-fixed: #ffe089;
 
-    /* Text colors */
-    --color-text-primary: #111827;
-    /* Near black */
-    --color-text-secondary: #4b5563;
-    /* Dark gray */
-    --color-text-tertiary: #9ca3af;
-    /* Light gray */
+    /* Back-compat aliases used by existing components */
+    --color-surface-50: var(--color-surface-container-lowest);
+    --color-surface-75: var(--color-surface);
+    --color-surface-100: var(--color-surface-container-low);
+    --color-surface-200: var(--color-outline-variant);
+    --color-surface-300: var(--color-surface-variant);
+    --color-text-primary: var(--color-on-surface);
+    --color-text-secondary: var(--color-on-surface-variant);
+    --color-text-tertiary: var(--color-outline);
+    --color-accent-primary: var(--color-primary);
+    --color-accent-secondary: var(--color-secondary);
+    --color-accent-muted: rgba(1, 22, 51, 0.08);
+    --color-success: #0f9d58;
+    --color-warning: #e7a100;
+    --color-danger: var(--color-error);
+    --color-code-bg: #f4f7fb;
+    --color-code-border: #d0daec;
+    --shadow-soft: 0 20px 45px -35px rgba(12, 32, 70, 0.6);
+    --shadow-card: 0 25px 50px -30px rgba(36, 67, 121, 0.35);
 
-    /* Accent colors - Scientific Blue/Teal */
-    --color-accent-primary: #0284c7;
-    /* Sky blue 600 */
-    --color-accent-secondary: #0ea5e9;
-    /* Sky blue 500 */
-
-    --color-success: #10b981;
-    /* Emerald */
-    --color-warning: #f59e0b;
-    /* Amber */
-    --color-danger: #ef4444;
-    /* Red */
-
-    /* Code colors */
-    --color-code-bg: #f8fafc;
-    /* Slate 50 */
-
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+    --font-headline: 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Manrope', system-ui, sans-serif;
+    --font-label: 'Inter', system-ui, sans-serif;
+    --font-mono: 'Fira Code', monospace;
+    --radius: 0.5rem;
 }
 
-body {
-    background-color: var(--color-surface-100);
-    color: var(--color-text-primary);
-    font-family: var(--font-sans);
+html, body {
+    min-height: 100%;
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+    font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
+}
+
+.app-body {
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+    isolation: isolate;
+    background: var(--color-surface);
+}
+
+.app-body::before,
+.app-body::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+}
+
+/* Soft orbital dots */
+.app-body::before {
+    background-image:
+        radial-gradient(circle 220px at 10% 20%, rgba(24, 43, 73, 0.05), transparent 65%),
+        radial-gradient(circle 160px at 90% 20%, rgba(254, 204, 0, 0.08), transparent 55%);
+    filter: blur(0.5px);
+}
+
+/* Technical grid overlay */
+.app-body::after {
+    background-image:
+        linear-gradient(transparent 94%, rgba(225, 226, 229, 0.5) 96%),
+        linear-gradient(90deg, transparent 94%, rgba(225, 226, 229, 0.5) 96%);
+    background-size: 48px 48px;
+    opacity: 0.45;
+}
+
+.app-shell {
+    width: min(1440px, 100%);
+    margin: 0 auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.glass-panel {
+    backdrop-filter: blur(12px);
+    background: rgba(248, 249, 252, 0.4);
+    border-radius: 0.75rem;
+}
+
+.section-heading {
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: var(--color-outline);
 }
 
 /* Force light mode */
@@ -100,11 +193,41 @@ body {
 }
 
 .font-sans {
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
+}
+
+.font-headline {
+    font-family: var(--font-headline);
+}
+
+.font-label {
+    font-family: var(--font-label);
+}
+
+.ambient-shadow {
+    box-shadow: 0 12px 32px -4px rgba(25, 28, 30, 0.06);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #e1e2e5;
+    border-radius: 10px;
 }
 
 /* Code block styling */
 pre,
 code {
     font-family: var(--font-mono);
+}
+
+::selection {
+    background: rgba(1, 22, 51, 0.18);
+    color: var(--color-on-surface);
 }
