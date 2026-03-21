@@ -34,21 +34,37 @@ jobs:
         run: |
           tar -czf deploy.tar.gz dist package.json bun.lock
 
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: astro-build
+          path: deploy.tar.gz
+
+      - name: Write SSH key
+        if: ${{ secrets.DEPLOY_HOST != '' && secrets.DEPLOY_USER != '' && secrets.DEPLOY_PATH != '' && secrets.DEPLOY_SERVICE != '' && secrets.DEPLOY_SSH_KEY != '' }}
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
       - name: Upload artifact to server
+        if: ${{ secrets.DEPLOY_HOST != '' && secrets.DEPLOY_USER != '' && secrets.DEPLOY_PATH != '' && secrets.DEPLOY_SERVICE != '' && secrets.DEPLOY_SSH_KEY != '' }}
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          key_path: /github/home/.ssh/deploy_key
           source: deploy.tar.gz
           target: ${{ secrets.DEPLOY_PATH }}
 
       - name: Deploy and restart service
+        if: ${{ secrets.DEPLOY_HOST != '' && secrets.DEPLOY_USER != '' && secrets.DEPLOY_PATH != '' && secrets.DEPLOY_SERVICE != '' && secrets.DEPLOY_SSH_KEY != '' }}
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          key_path: /github/home/.ssh/deploy_key
           script_stop: true
           script: |
             set -euo pipefail
