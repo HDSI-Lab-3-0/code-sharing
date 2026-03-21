@@ -1,4 +1,3 @@
-import { HeroUIProvider } from "@heroui/react";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { useEffect, useState, type ReactNode } from "react";
 
@@ -30,11 +29,9 @@ export default function Provider({ children }: { children: ReactNode }) {
 
     return (
         <ConvexProvider client={convex}>
-            <HeroUIProvider>
-                <div className="light" data-theme="light">
-                    {children}
-                </div>
-            </HeroUIProvider>
+            <div className="light" data-theme="light">
+                {children}
+            </div>
         </ConvexProvider>
     );
 }

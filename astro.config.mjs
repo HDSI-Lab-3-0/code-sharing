@@ -2,14 +2,12 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from "@tailwindcss/vite";
 import react from '@astrojs/react';
-import node from '@astrojs/node';
 
 // https://astro.build/config
 export default defineConfig({
-    output: 'server',
-    adapter: node({
-        mode: 'standalone'
-    }),
+    site: 'https://hdsi-lab-3-0.github.io',
+    base: '/code-sharing',
+    output: 'static',
     integrations: [react()],
     vite: {
         plugins: [
