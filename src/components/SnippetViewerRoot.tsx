@@ -12,7 +12,7 @@ export default function SnippetViewerRoot({ publicId = "" }: { publicId?: string
     if (!resolvedPublicId) {
         return (
             <Provider>
-                <div className="flex min-h-screen items-center justify-center px-6 text-center text-[#44474e]">
+                <div className="flex h-full min-h-0 items-center justify-center px-4 text-center text-sm text-[#44474e]">
                     Missing snippet id.
                 </div>
             </Provider>

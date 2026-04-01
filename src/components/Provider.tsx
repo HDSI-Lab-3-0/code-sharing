@@ -29,7 +29,7 @@ export default function Provider({ children }: { children: ReactNode }) {
 
     return (
         <ConvexProvider client={convex}>
-            <div className="light" data-theme="light">
+            <div className="light h-full min-h-0" data-theme="light">
                 {children}
             </div>
         </ConvexProvider>

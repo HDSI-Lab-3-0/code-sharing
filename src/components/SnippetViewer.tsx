@@ -4,6 +4,7 @@ import * as Diff from "diff";
 import { formatDistanceToNow } from "date-fns";
 import { api } from "../../convex/_generated/api";
 import { detectLanguage, highlightHtml } from "../lib/highlighter";
+import { withBasePath } from "../lib/utils";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card, CardBody, CardHeader } from "./ui/card";
@@ -45,10 +46,10 @@ function CodeDisplay({
 
     if (viewMode === "code" || !normalizedCompareCode) {
         return (
-            <div className="flex min-h-[640px] overflow-x-auto bg-white font-mono text-sm leading-relaxed">
+            <div className="flex min-h-0 flex-1 overflow-auto bg-white font-mono text-xs leading-relaxed">
                 <div className="min-w-12 shrink-0 select-none border-r border-[#c5c6ce]/50 bg-[#edeef1] px-2 text-right text-slate-400">
                     {lines.map((_, i) => (
-                        <div key={i} className="flex min-h-[1.5em] items-center justify-end">
+                        <div key={i} className="flex min-h-[1.35em] items-center justify-end">
                             <span className="px-1">{i + 1}</span>
                         </div>
                     ))}
@@ -57,7 +58,7 @@ function CodeDisplay({
                     {lines.map((line, i) => {
                         const { html } = highlightHtml(line, detectedLanguage);
                         return (
-                            <div key={i} className="flex min-h-[1.5em] w-full items-center px-4 leading-relaxed whitespace-pre">
+                            <div key={i} className="flex min-h-[1.35em] w-full items-center px-2 leading-relaxed whitespace-pre">
                                 <span className="w-full" dangerouslySetInnerHTML={{ __html: html || " " }} />
                             </div>
                         );
@@ -117,9 +118,9 @@ function CodeDisplay({
     });
 
     return (
-        <div className="min-h-[640px] overflow-x-auto bg-white font-mono text-sm leading-relaxed">
+        <div className="flex min-h-0 flex-1 flex-col overflow-auto bg-white font-mono text-xs leading-relaxed">
             {rows.length === 0 ? (
-                <div className="flex min-h-[640px] w-full items-center justify-center px-6 text-center text-sm text-[#75777e]">
+                <div className="flex min-h-[8rem] flex-1 items-center justify-center px-4 text-center text-xs text-[#75777e]">
                     No line-level changes between these versions.
                 </div>
             ) : (
@@ -166,20 +167,6 @@ function ConsoleSection({
     statusMessage: string;
 }) {
     const [inputContent, setInputContent] = useState("");
-    const [copyStatus, setCopyStatus] = useState("Copy Latest Log");
-
-    const latestLog = feedbackList.length > 0 ? feedbackList[0] : null;
-
-    const handleCopy = async () => {
-        if (!latestLog) return;
-        try {
-            await navigator.clipboard.writeText(`[${new Date(latestLog.createdAt).toISOString()}] ${latestLog.content}`);
-            setCopyStatus("Copied!");
-        } catch {
-            setCopyStatus("Copy Failed");
-        }
-        window.setTimeout(() => setCopyStatus("Copy Latest Log"), 2000);
-    };
 
     const handleSubmit = async () => {
         if (!inputContent.trim() || isSubmitting) return;
@@ -193,8 +180,8 @@ function ConsoleSection({
     };
 
     return (
-        <Card className="ambient-shadow overflow-hidden rounded-2xl border-none bg-white">
-            <CardHeader className="flex items-center justify-between border-b border-[#c5c6ce]/40 bg-[#e7e8eb] px-6 py-3">
+        <Card className="ambient-shadow flex h-full min-h-0 flex-col overflow-hidden rounded-xl border-none bg-white">
+            <CardHeader className="flex shrink-0 items-center border-b border-[#c5c6ce]/40 bg-[#e7e8eb] px-3 py-2">
                 <div className="flex items-center gap-4">
                     <div className="flex gap-1.5">
                         <div className="h-3 w-3 rounded-full bg-[#ba1a1a]/40" />
@@ -203,12 +190,9 @@ function ConsoleSection({
                     </div>
                     <span className="font-label text-[10px] font-bold tracking-widest text-slate-500 uppercase">console.log</span>
                 </div>
-                <Button type="button" size="sm" variant="outline" onClick={handleCopy} disabled={!latestLog} className="h-8 border-[#c5c6ce] bg-white">
-                    {copyStatus}
-                </Button>
             </CardHeader>
-            <CardBody className="p-0">
-                <div className="h-[500px] space-y-2 overflow-y-auto bg-white px-4 py-4 font-mono text-xs">
+            <CardBody className="flex min-h-0 flex-1 flex-col p-0">
+                <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto bg-white px-3 py-2 font-mono text-[11px]">
                     {feedbackList.length === 0 && (
                         <div className="rounded-xl border border-dashed border-[#c5c6ce] px-4 py-3 text-center text-slate-500">
                             No logs yet for this version.
@@ -223,20 +207,20 @@ function ConsoleSection({
                         </div>
                     ))}
                 </div>
-                <div className="border-t border-[#c5c6ce]/40 bg-[#edeef1] px-4 py-4">
-                    <div className="flex flex-col gap-3 md:flex-row md:items-end">
+                <div className="shrink-0 border-t border-[#c5c6ce]/40 bg-[#edeef1] px-3 py-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
                         <Textarea
                             placeholder="Paste runtime output, errors, or notes..."
                             value={inputContent}
                             onChange={(e) => setInputContent(e.target.value)}
-                            rows={3}
-                            className="min-h-0 border-[#c5c6ce] bg-white font-mono text-sm"
+                            rows={2}
+                            className="min-h-0 border-[#c5c6ce] bg-white font-mono text-xs"
                         />
-                        <Button type="button" className="h-11 rounded-xl bg-[#011633] text-white" onClick={handleSubmit} isLoading={isSubmitting}>
+                        <Button type="button" className="h-8 shrink-0 rounded-lg bg-[#011633] px-3 text-xs text-white" onClick={handleSubmit} isLoading={isSubmitting}>
                             Add Log
                         </Button>
                     </div>
-                    {statusMessage ? <p className="mt-2 text-xs text-[#44474e]">{statusMessage}</p> : null}
+                    {statusMessage ? <p className="mt-1 text-[10px] text-[#44474e]">{statusMessage}</p> : null}
                 </div>
             </CardBody>
         </Card>
@@ -244,7 +228,7 @@ function ConsoleSection({
 }
 
 export default function SnippetViewer({ publicId }: { publicId: string }) {
-    const homeHref = import.meta.env.BASE_URL;
+    const homeHref = withBasePath("");
     const data = useQuery(api.snippets.getSnippet, { publicId });
     const addFeedback = useMutation(api.snippets.addFeedback);
     const createVersion = useMutation(api.snippets.createVersion);
@@ -260,7 +244,6 @@ export default function SnippetViewer({ publicId }: { publicId: string }) {
     const [isEditing, setIsEditing] = useState(false);
     const [newCode, setNewCode] = useState("");
     const [isPublishing, setIsPublishing] = useState(false);
-    const [copyMessage, setCopyMessage] = useState("");
     const [publishMessage, setPublishMessage] = useState("");
     const [consoleMessage, setConsoleMessage] = useState("");
     const [isAddingLog, setIsAddingLog] = useState(false);
@@ -314,29 +297,19 @@ export default function SnippetViewer({ publicId }: { publicId: string }) {
 
     if (data === undefined) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-[#011633]" />
+            <div className="flex h-full min-h-0 items-center justify-center">
+                <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-[#011633]" />
             </div>
         );
     }
 
     if (data === null) {
-        return <div className="flex min-h-screen items-center justify-center text-[#ba1a1a]">Snippet not found.</div>;
+        return <div className="flex h-full min-h-0 items-center justify-center text-sm text-[#ba1a1a]">Snippet not found.</div>;
     }
 
     if (!currentVersionData) {
-        return <div className="flex min-h-screen items-center justify-center text-[#44474e]">No version available.</div>;
+        return <div className="flex h-full min-h-0 items-center justify-center text-sm text-[#44474e]">No version available.</div>;
     }
-
-    const handleCopyCode = async () => {
-        try {
-            await navigator.clipboard.writeText(currentVersionData.code);
-            setCopyMessage("Copied!");
-        } catch {
-            setCopyMessage("Copy failed");
-        }
-        window.setTimeout(() => setCopyMessage(""), 2000);
-    };
 
     const submitFeedback = async (content: string) => {
         setConsoleMessage("");
@@ -381,7 +354,7 @@ export default function SnippetViewer({ publicId }: { publicId: string }) {
             const nextVersion = await createVersion({
                 publicId,
                 code: newCode,
-                language: currentVersionData.language,
+                language: detectLanguage(newCode) ?? "plaintext",
                 password: adminPassword,
             });
             setIsEditing(false);
@@ -401,76 +374,75 @@ export default function SnippetViewer({ publicId }: { publicId: string }) {
     const disableDiff = availableCompareVersions.length === 0;
 
     return (
-        <div className="flex min-h-screen flex-col bg-[#f8f9fc] text-[#191c1e]">
-            <header className="sticky top-0 z-50 border-b border-[#182B49]/10 bg-slate-50/40 shadow-sm backdrop-blur-md">
-                <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-8 py-4">
-                    <span className="font-headline text-2xl font-black tracking-tighter text-[#182B49]">HDSI Code Curator</span>
-                    <Badge className="bg-[#fecc00] text-[#6e5700]">View Snippet</Badge>
+        <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#f8f9fc] text-[#191c1e]">
+            <header className="z-50 shrink-0 border-b border-[#182B49]/10 bg-slate-50/40 shadow-sm backdrop-blur-md">
+                <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-4 py-2">
+                    <span className="font-headline text-lg font-black tracking-tighter text-[#182B49]">HDSI Code Curator</span>
+                    <Badge className="bg-[#fecc00] px-2 py-0 text-[10px] text-[#6e5700]">View Snippet</Badge>
                 </div>
             </header>
 
-            <div className="flex flex-1 overflow-hidden">
-                <aside className="hidden h-[calc(100vh-76px)] w-72 flex-col space-y-8 border-r border-[#182B49]/5 bg-slate-50 p-6 font-label lg:flex">
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-3 px-3 py-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#182b49] text-[#fecc00]">
-                                <span className="text-sm font-bold">H</span>
+            <div className="flex min-h-0 flex-1 overflow-hidden">
+                <aside className="hidden min-h-0 w-56 shrink-0 flex-col space-y-4 border-r border-[#182B49]/5 bg-slate-50 p-3 font-label lg:flex">
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-2 px-2 py-1">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#182b49] text-[#fecc00]">
+                                <span className="text-xs font-bold">H</span>
                             </div>
                             <div>
-                                <h3 className="font-headline font-bold leading-tight text-[#182B49]">Research Workspace</h3>
-                                <p className="text-[10px] tracking-tighter text-slate-500 uppercase">Halicioglu Data Science Institute</p>
+                                <h3 className="font-headline text-sm font-bold leading-tight text-[#182B49]">Research Workspace</h3>
+                                <p className="text-[9px] tracking-tighter text-slate-500 uppercase">Halicioglu Data Science Institute</p>
                             </div>
                         </div>
                     </div>
-                    <nav className="flex-1 space-y-1">
-                        <a className="flex items-center gap-3 rounded-xl px-4 py-3 text-[#44474e]" href={homeHref}>
-                            <span className="text-sm font-semibold">Create Snippet</span>
+                    <nav className="min-h-0 flex-1 space-y-1">
+                        <a className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-[#44474e]" href={homeHref}>
+                            <span className="font-semibold">Create Snippet</span>
                         </a>
-                        <a className="translate-x-1 flex items-center gap-3 rounded-xl bg-[#011633] px-4 py-3 text-white shadow-lg" href="#">
-                            <span className="text-sm font-semibold">View Snippet</span>
+                        <a className="translate-x-0.5 flex items-center gap-2 rounded-lg bg-[#011633] px-3 py-2 text-white shadow-md" href="#">
+                            <span className="text-xs font-semibold">View Snippet</span>
                         </a>
                     </nav>
                 </aside>
 
-                <main className="flex-1 overflow-y-auto bg-[#f2f3f6] p-8">
-                    <div className="mx-auto max-w-6xl space-y-6">
-                        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+                <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#f2f3f6] p-3">
+                    <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col gap-2 overflow-hidden">
+                        <div className="flex shrink-0 flex-col justify-between gap-2 md:flex-row md:items-center">
                             <div>
-                                <div className="mb-2 flex items-center gap-2">
-                                    <h1 className="font-headline text-4xl font-black tracking-tight text-[#011633]">Snippet #{publicId}</h1>
-                                    <Badge className="bg-[#e1e2e5] text-[#44474e]">{currentVersionData.language}</Badge>
+                                <div className="mb-0.5 flex flex-wrap items-center gap-2">
+                                    <h1 className="font-headline text-xl font-black tracking-tight text-[#011633]">Snippet #{publicId}</h1>
+                                    <Badge className="bg-[#e1e2e5] px-2 py-0 text-[10px] text-[#44474e]">{currentVersionData.language}</Badge>
                                 </div>
-                                <p className="text-[#44474e]">
+                                <p className="text-xs text-[#44474e]">
                                     Version {currentVersionData.version} updated {formatDistanceToNow(currentVersionData._creationTime)} ago
                                 </p>
                             </div>
-                            <Button type="button" className="h-11 rounded-xl bg-[#011633] text-white" onClick={handleStartEdit}>
+                            <Button type="button" className="h-8 shrink-0 rounded-lg bg-[#011633] px-3 text-xs text-white" onClick={handleStartEdit}>
                                 {isEditing ? "Cancel New Version" : "Add New Version"}
                             </Button>
                         </div>
 
                         {isEditing ? (
-                            <Card className="ambient-shadow rounded-xl border-none bg-white p-0">
-                                <CardHeader className="flex items-center justify-between border-b border-[#c5c6ce]/30 bg-[#e7e8eb] px-6 py-3">
-                                    <span className="font-label text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+                            <Card className="ambient-shadow flex max-h-[min(38vh,260px)] min-h-0 shrink-0 flex-col overflow-hidden rounded-lg border-none bg-white p-0">
+                                <CardHeader className="flex shrink-0 items-center justify-between border-b border-[#c5c6ce]/30 bg-[#e7e8eb] px-3 py-2">
+                                    <span className="font-label text-[9px] font-bold tracking-widest text-slate-500 uppercase">
                                         Drafting Version {currentVersionData.version + 1}
                                     </span>
-                                    <span className="text-xs text-slate-500">Authorized session</span>
+                                    <span className="text-[10px] text-slate-500">Authorized session</span>
                                 </CardHeader>
-                                <CardBody className="space-y-3 p-6">
+                                <CardBody className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden p-3">
                                     <Textarea
                                         value={newCode}
                                         onChange={(e) => setNewCode(e.target.value)}
-                                        rows={12}
-                                        className="min-h-[280px] border-[#c5c6ce] bg-white font-mono text-sm text-[#011633]"
+                                        className="min-h-0 flex-1 resize-none overflow-y-auto border-[#c5c6ce] bg-white font-mono text-xs text-[#011633]"
                                     />
-                                    <div className="flex items-center justify-end gap-3">
-                                        <Button type="button" variant="outline" className="border-[#c5c6ce]" onClick={handleStartEdit}>
+                                    <div className="flex shrink-0 items-center justify-end gap-2">
+                                        <Button type="button" variant="outline" className="h-8 border-[#c5c6ce] px-3 text-xs" onClick={handleStartEdit}>
                                             Cancel
                                         </Button>
                                         <Button
                                             type="button"
-                                            className="bg-[#011633] text-white"
+                                            className="h-8 bg-[#011633] px-3 text-xs text-white"
                                             onClick={handleNewVersion}
                                             isLoading={isPublishing}
                                             disabled={!newCode.trim()}
@@ -483,7 +455,7 @@ export default function SnippetViewer({ publicId }: { publicId: string }) {
                         ) : null}
 
                         {publishMessage ? (
-                            <div className="rounded-xl border border-[#c5c6ce]/50 bg-white px-4 py-3 text-sm text-[#44474e]">{publishMessage}</div>
+                            <div className="shrink-0 rounded-lg border border-[#c5c6ce]/50 bg-white px-3 py-2 text-xs text-[#44474e]">{publishMessage}</div>
                         ) : null}
 
                         <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
@@ -513,26 +485,26 @@ export default function SnippetViewer({ publicId }: { publicId: string }) {
                             </DialogContent>
                         </Dialog>
 
-                        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                            <TabsList className="h-12 w-full justify-start gap-6 rounded-none border-b border-[#c5c6ce]/40 bg-transparent p-0">
+                        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
+                            <TabsList className="h-9 w-full shrink-0 justify-start gap-4 rounded-none border-b border-[#c5c6ce]/40 bg-transparent p-0">
                                 <TabsTrigger
                                     value="code"
-                                    className="h-12 rounded-none border-b-2 border-transparent px-0 pb-0 text-[#75777e] data-[state=active]:border-[#011633] data-[state=active]:bg-transparent data-[state=active]:text-[#011633]"
+                                    className="h-9 rounded-none border-b-2 border-transparent px-0 pb-0 text-xs text-[#75777e] data-[state=active]:border-[#011633] data-[state=active]:bg-transparent data-[state=active]:text-[#011633]"
                                 >
                                     Code
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="console"
-                                    className="h-12 rounded-none border-b-2 border-transparent px-0 pb-0 text-[#75777e] data-[state=active]:border-[#011633] data-[state=active]:bg-transparent data-[state=active]:text-[#011633]"
+                                    className="h-9 rounded-none border-b-2 border-transparent px-0 pb-0 text-xs text-[#75777e] data-[state=active]:border-[#011633] data-[state=active]:bg-transparent data-[state=active]:text-[#011633]"
                                 >
                                     Console
-                                    {safeFeedback.length > 0 ? <Badge className="ml-2 bg-[#e1e2e5] text-[#44474e]">{safeFeedback.length}</Badge> : null}
+                                    {safeFeedback.length > 0 ? <Badge className="ml-1 bg-[#e1e2e5] px-1.5 py-0 text-[10px] text-[#44474e]">{safeFeedback.length}</Badge> : null}
                                 </TabsTrigger>
                             </TabsList>
 
-                            <TabsContent value="code" className="mt-4">
-                                <Card className="ambient-shadow overflow-hidden rounded-2xl border-none bg-[#e1e2e5]">
-                                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#c5c6ce]/40 bg-[#e7e8eb] px-4 py-3">
+                            <TabsContent value="code" className="mt-2 flex min-h-0 flex-1 flex-col overflow-hidden data-[state=inactive]:hidden">
+                                <Card className="ambient-shadow flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border-none bg-[#e1e2e5]">
+                                    <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-[#c5c6ce]/40 bg-[#e7e8eb] px-3 py-2">
                                         <div className="flex flex-wrap items-center gap-2">
                                             <div className="flex items-center rounded-lg border border-[#c5c6ce] bg-white p-1">
                                                 <button
@@ -587,14 +559,10 @@ export default function SnippetViewer({ publicId }: { publicId: string }) {
                                                 </>
                                             ) : null}
                                         </div>
-
-                                        <Button type="button" size="sm" variant="outline" className="h-8 border-[#c5c6ce] bg-white" onClick={handleCopyCode}>
-                                            {copyMessage || "Copy Code"}
-                                        </Button>
                                     </div>
 
                                     {viewMode === "diff" && !compareVersionData ? (
-                                        <div className="flex min-h-[420px] items-center justify-center bg-white px-6 text-center text-sm text-[#75777e]">
+                                        <div className="flex min-h-0 flex-1 items-center justify-center bg-white px-4 py-6 text-center text-xs text-[#75777e]">
                                             Select another version to compare.
                                         </div>
                                     ) : (
@@ -608,7 +576,7 @@ export default function SnippetViewer({ publicId }: { publicId: string }) {
                                 </Card>
                             </TabsContent>
 
-                            <TabsContent value="console" className="mt-4">
+                            <TabsContent value="console" className="mt-2 flex min-h-0 flex-1 flex-col overflow-hidden data-[state=inactive]:hidden">
                                 <ConsoleSection feedbackList={safeFeedback} onSubmitFeedback={submitFeedback} isSubmitting={isAddingLog} statusMessage={consoleMessage} />
                             </TabsContent>
                         </Tabs>

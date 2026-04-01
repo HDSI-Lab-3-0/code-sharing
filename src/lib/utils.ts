@@ -4,3 +4,10 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
+
+/** Join Vite/Astro `import.meta.env.BASE_URL` (may omit trailing slash) with a path segment. */
+export function withBasePath(path: string): string {
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    const p = path.replace(/^\//, "");
+    return p ? `${base}/${p}` : `${base}/`;
+}

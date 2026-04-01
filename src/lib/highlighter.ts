@@ -108,6 +108,36 @@ export function languageLabelFromId(id: string | null | undefined) {
   return LANGUAGE_OPTIONS.find((option) => option.id === id)?.label ?? "Unknown";
 }
 
+const LANGUAGE_TO_EXT: Record<string, string> = {
+  javascript: "js",
+  typescript: "ts",
+  python: "py",
+  java: "java",
+  cpp: "cpp",
+  csharp: "cs",
+  php: "php",
+  ruby: "rb",
+  go: "go",
+  rust: "rs",
+  swift: "swift",
+  kotlin: "kt",
+  html: "html",
+  css: "css",
+  scss: "scss",
+  json: "json",
+  sql: "sql",
+  bash: "sh",
+  yaml: "yml",
+  markdown: "md",
+  plaintext: "txt",
+};
+
+/** File extension for the fake editor tab (from detected/stored hljs language id). */
+export function languageToExtension(lang: string | null | undefined): string {
+  if (!lang || lang === "auto") return "txt";
+  return LANGUAGE_TO_EXT[lang] ?? "txt";
+}
+
 function normalizeLanguage(language: string | null | undefined) {
   if (!language) return null;
   return LANGUAGE_ALIASES[language] ?? language;
