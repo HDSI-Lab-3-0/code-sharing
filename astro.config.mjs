@@ -5,8 +5,8 @@ import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
-    site: 'https://hdsi-lab-3-0.github.io',
-    base: '/code-sharing',
+    site: 'https://share.hdsilab3.com',
+    base: '/',
     output: 'static',
     integrations: [react()],
     vite: {
