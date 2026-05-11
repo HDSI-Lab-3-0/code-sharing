@@ -34,7 +34,14 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build site
-        run: bun run build
+        env:
+          PUBLIC_CONVEX_URL: ${{ vars.PUBLIC_CONVEX_URL || secrets.PUBLIC_CONVEX_URL }}
+        run: |
+          test -n "$PUBLIC_CONVEX_URL" || {
+            echo "PUBLIC_CONVEX_URL is required for the static GitHub Pages build."
+            exit 1
+          }
+          bun run build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
