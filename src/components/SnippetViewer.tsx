@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import * as Diff from "diff";
 import { formatDistanceToNow } from "date-fns";
 import { api } from "../../convex/_generated/api";
@@ -232,6 +232,7 @@ export default function SnippetViewer({ publicId }: { publicId: string }) {
     const data = useQuery(api.snippets.getSnippet, { publicId });
     const addFeedback = useMutation(api.snippets.addFeedback);
     const createVersion = useMutation(api.snippets.createVersion);
+    const verifyPassword = useAction(api.auth.verifyPassword);
 
     const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
     const [compareVersion, setCompareVersion] = useState<number | null>(null);
@@ -240,6 +241,8 @@ export default function SnippetViewer({ publicId }: { publicId: string }) {
 
     const [adminPassword, setAdminPassword] = useState("");
     const [tempPassword, setTempPassword] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+    const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [newCode, setNewCode] = useState("");
@@ -335,15 +338,29 @@ export default function SnippetViewer({ publicId }: { publicId: string }) {
             return;
         }
         setTempPassword("");
+        setPasswordError("");
         setIsPasswordModalOpen(true);
     };
 
-    const handlePasswordSubmit = () => {
-        if (!tempPassword.trim()) return;
-        setAdminPassword(tempPassword.trim());
-        setIsPasswordModalOpen(false);
-        setIsEditing(true);
-        setNewCode(currentVersionData.code);
+    const handlePasswordSubmit = async () => {
+        const password = tempPassword.trim();
+        if (!password) return;
+
+        setIsVerifyingPassword(true);
+        setPasswordError("");
+        try {
+            await verifyPassword({ password });
+            setAdminPassword(password);
+            setIsPasswordModalOpen(false);
+            setIsEditing(true);
+            setNewCode(currentVersionData.code);
+            setTempPassword("");
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Invalid password";
+            setPasswordError(message);
+        } finally {
+            setIsVerifyingPassword(false);
+        }
     };
 
     const handleNewVersion = async () => {
@@ -468,17 +485,27 @@ export default function SnippetViewer({ publicId }: { publicId: string }) {
                                     placeholder="Enter admin password"
                                     type="password"
                                     value={tempPassword}
-                                    onChange={(e) => setTempPassword(e.target.value)}
+                                    onChange={(e) => {
+                                        setTempPassword(e.target.value);
+                                        if (passwordError) setPasswordError("");
+                                    }}
                                     autoFocus
                                     onKeyDown={(e) => {
-                                        if (e.key === "Enter") handlePasswordSubmit();
+                                        if (e.key === "Enter") void handlePasswordSubmit();
                                     }}
                                 />
+                                {passwordError ? <p className="text-xs text-[#93000a]">{passwordError}</p> : null}
                                 <DialogFooter>
                                     <Button type="button" variant="ghost" onClick={() => setIsPasswordModalOpen(false)}>
                                         Cancel
                                     </Button>
-                                    <Button type="button" className="bg-[#011633] text-white" onClick={handlePasswordSubmit}>
+                                    <Button
+                                        type="button"
+                                        className="bg-[#011633] text-white"
+                                        onClick={() => void handlePasswordSubmit()}
+                                        isLoading={isVerifyingPassword}
+                                        disabled={!tempPassword.trim()}
+                                    >
                                         Verify
                                     </Button>
                                 </DialogFooter>

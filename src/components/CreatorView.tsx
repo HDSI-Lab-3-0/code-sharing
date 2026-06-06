@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useMutation } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import Provider from "./Provider";
 import { detectLanguage, languageLabelFromId, languageToExtension } from "../lib/highlighter";
@@ -13,6 +13,8 @@ import { Textarea } from "./ui/textarea";
 function CreatorViewContent() {
     const [gatePassword, setGatePassword] = useState("");
     const [isGateOpen, setIsGateOpen] = useState(false);
+    const [isVerifyingGate, setIsVerifyingGate] = useState(false);
+    const [gateError, setGateError] = useState("");
 
     // Form state
     const [code, setCode] = useState("");
@@ -22,11 +24,23 @@ function CreatorViewContent() {
     const detectedLanguage = useMemo(() => detectLanguage(code) ?? "plaintext", [code]);
 
     const createSnippet = useMutation(api.snippets.createSnippet);
+    const verifyPassword = useAction(api.auth.verifyPassword);
 
-    const handleGateSubmit = (e: React.FormEvent) => {
+    const handleGateSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (gatePassword.trim()) {
+        const password = gatePassword.trim();
+        if (!password) return;
+
+        setIsVerifyingGate(true);
+        setGateError("");
+        try {
+            await verifyPassword({ password });
             setIsGateOpen(true);
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "Invalid password";
+            setGateError(message);
+        } finally {
+            setIsVerifyingGate(false);
         }
     };
 
@@ -66,10 +80,12 @@ function CreatorViewContent() {
                                 type="submit"
                                 className="h-9 w-full rounded-lg bg-[#011633] text-sm font-semibold text-white"
                                 disabled={!gatePassword}
+                                isLoading={isVerifyingGate}
                             >
                                 <Lock className="h-3.5 w-3.5" />
                                 Continue to Workspace
                             </Button>
+                            {gateError ? <p className="text-xs text-[#93000a]">{gateError}</p> : null}
                         </form>
                     </CardBody>
                 </Card>
